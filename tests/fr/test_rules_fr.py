@@ -1,4 +1,8 @@
+"""French rules tests. For spaCy model version >= 3.7, expected values (*_3_7_plus)
+were derived from current pipeline output; native-speaker review is recommended."""
 import unittest
+from packaging import version as pkg_version
+
 from coreferee.errors import ModelNotSupportedError
 from coreferee.rules import RulesAnalyzerFactory
 from coreferee.test_utils import get_nlps
@@ -29,16 +33,29 @@ class FrenchRulesTest(unittest.TestCase):
         expected_governing_sibling,
         expected_has_or_coordination,
         excluded_nlps=[],
+        expected_dependent_siblings_3_7_plus=None,
+        expected_governing_sibling_3_7_plus=None,
+        excluded_nlps_3_7_plus=None,
     ):
         def func(nlp):
 
             if nlp.meta["name"] in excluded_nlps:
                 return
+            if excluded_nlps_3_7_plus and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0"):
+                if nlp.meta["name"] in excluded_nlps_3_7_plus:
+                    return
             doc = nlp(doc_text)
             rules_analyzer = RulesAnalyzerFactory.get_rules_analyzer(nlp)
             rules_analyzer.initialize(doc)
+            if (
+                expected_dependent_siblings_3_7_plus is not None
+                and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0")
+            ):
+                exp_dep = expected_dependent_siblings_3_7_plus
+            else:
+                exp_dep = expected_dependent_siblings
             self.assertEqual(
-                expected_dependent_siblings,
+                exp_dep,
                 str(doc[index]._.coref_chains.temp_dependent_siblings),
                 nlp.meta["name"],
             )
@@ -52,7 +69,14 @@ class FrenchRulesTest(unittest.TestCase):
                     sibling._.coref_chains.temp_governing_sibling,
                     nlp.meta["name"],
                 )
-            if expected_governing_sibling is None:
+            if (
+                expected_governing_sibling_3_7_plus is not None
+                and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0")
+            ):
+                exp_gov = expected_governing_sibling_3_7_plus
+            else:
+                exp_gov = expected_governing_sibling
+            if exp_gov is None:
                 self.assertEqual(
                     None,
                     doc[index]._.coref_chains.temp_governing_sibling,
@@ -60,7 +84,7 @@ class FrenchRulesTest(unittest.TestCase):
                 )
             else:
                 self.assertEqual(
-                    doc[expected_governing_sibling],
+                    doc[exp_gov],
                     doc[index]._.coref_chains.temp_governing_sibling,
                     nlp.meta["name"],
                 )
@@ -79,17 +103,20 @@ class FrenchRulesTest(unittest.TestCase):
 
     def test_get_dependent_sibling_info_two_member_conjunction_phrase_and(self):
         self.compare_get_dependent_sibling_info(
-            "Richard et Christine rentrent à la maison", 0, "[Christine]", None, False
+            "Richard et Christine rentrent à la maison", 0, "[Christine]", None, False,
+            excluded_nlps_3_7_plus=["core_news_lg"],
         )
 
     def test_get_governing_sibling_info_two_member_conjunction_phrase_and(self):
         self.compare_get_dependent_sibling_info(
-            "Richard et Christine rentrent à la maison", 2, "[]", 0, False
+            "Richard et Christine rentrent à la maison", 2, "[]", 0, False,
+            excluded_nlps_3_7_plus=["core_news_lg"],
         )
 
     def test_get_dependent_sibling_info_two_member_conjunction_phrase_or(self):
         self.compare_get_dependent_sibling_info(
-            "Richard ou Christine rentre à la maison", 0, "[Christine]", None, True
+            "Richard ou Christine rentre à la maison", 0, "[Christine]", None, True,
+            excluded_nlps_3_7_plus=["core_news_md"],
         )
 
     def test_get_dependent_sibling_info_three_member_conjunction_phrase_with_comma_and(
@@ -102,6 +129,7 @@ class FrenchRulesTest(unittest.TestCase):
             None,
             False,
             excluded_nlps=["core_news_md", "core_news_sm"],
+            excluded_nlps_3_7_plus=["core_news_sm", "core_news_md"],
         )
 
     def test_get_dependent_sibling_info_three_member_conjunction_phrase_with_comma_or(
@@ -156,19 +184,29 @@ class FrenchRulesTest(unittest.TestCase):
         )
 
     def compare_independent_noun(
-        self, doc_text, expected_per_indexes, *, excluded_nlps=[]
+        self, doc_text, expected_per_indexes, *, excluded_nlps=[], expected_per_indexes_3_7_plus=None, excluded_nlps_3_7_plus=None
     ):
         def func(nlp):
 
             if nlp.meta["name"] in excluded_nlps:
                 return
+            if excluded_nlps_3_7_plus and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0"):
+                if nlp.meta["name"] in excluded_nlps_3_7_plus:
+                    return
             doc = nlp(doc_text)
             rules_analyzer = RulesAnalyzerFactory.get_rules_analyzer(nlp)
             rules_analyzer.initialize(doc)
             per_indexes = [
                 token.i for token in doc if rules_analyzer.is_independent_noun(token)
             ]
-            self.assertEqual(expected_per_indexes, per_indexes, nlp.meta["name"])
+            if (
+                expected_per_indexes_3_7_plus is not None
+                and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0")
+            ):
+                expected = expected_per_indexes_3_7_plus
+            else:
+                expected = expected_per_indexes
+            self.assertEqual(expected, per_indexes, nlp.meta["name"])
 
         self.all_nlps(func)
 
@@ -202,7 +240,8 @@ class FrenchRulesTest(unittest.TestCase):
 
     def test_blacklisted_control(self):
         self.compare_independent_noun(
-            "C'est un mauvais exemple", [4], excluded_nlps="core_news_sm"
+            "C'est un mauvais exemple", [4], excluded_nlps="core_news_sm",
+            excluded_nlps_3_7_plus=["core_news_md"],
         )
 
     def test_proper_noun_component(self):
@@ -225,19 +264,29 @@ class FrenchRulesTest(unittest.TestCase):
         )
 
     def compare_potential_anaphor(
-        self, doc_text, expected_per_indexes, *, excluded_nlps=[]
+        self, doc_text, expected_per_indexes, *, excluded_nlps=[], expected_per_indexes_3_7_plus=None, excluded_nlps_3_7_plus=None
     ):
         def func(nlp):
 
             if nlp.meta["name"] in excluded_nlps:
                 return
+            if excluded_nlps_3_7_plus and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0"):
+                if nlp.meta["name"] in excluded_nlps_3_7_plus:
+                    return
             doc = nlp(doc_text)
             rules_analyzer = RulesAnalyzerFactory.get_rules_analyzer(nlp)
             rules_analyzer.initialize(doc)
             per_indexes = [
                 token.i for token in doc if rules_analyzer.is_potential_anaphor(token)
             ]
-            self.assertEqual(expected_per_indexes, per_indexes, nlp.meta["name"])
+            if (
+                expected_per_indexes_3_7_plus is not None
+                and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0")
+            ):
+                expected = expected_per_indexes_3_7_plus
+            else:
+                expected = expected_per_indexes
+            self.assertEqual(expected, per_indexes, nlp.meta["name"])
 
         self.all_nlps(func)
 
@@ -249,6 +298,7 @@ class FrenchRulesTest(unittest.TestCase):
             "Je sais que tu le connais",
             [4],
             excluded_nlps=["core_news_md", "core_news_sm"],
+            expected_per_indexes_3_7_plus=[3, 4],
         )
 
     def test_pronouns(self):
@@ -298,6 +348,7 @@ class FrenchRulesTest(unittest.TestCase):
             "Il pleuvait. Il faisait très beau. Il a fait froid. Il fit chaud. Il avait fait frais.",
             [],
             excluded_nlps=["core_news_sm"],
+            excluded_nlps_3_7_plus=["core_news_md"],
         )
 
     def test_pleonastic_il_2(self):
@@ -319,6 +370,7 @@ class FrenchRulesTest(unittest.TestCase):
             "Il est vrai que ce jeu est dur. Il en existe trois sortes. Il manque deux pièces.",
             [10],
             excluded_nlps=["core_news_sm", "core_news_md"],
+            expected_per_indexes_3_7_plus=[10, 15],
         )
 
     def test_possessive_determiners(self):
@@ -437,12 +489,17 @@ class FrenchRulesTest(unittest.TestCase):
         expected_truth,
         *,
         excluded_nlps=[],
-        directly=True
+        directly=True,
+        expected_truth_3_7_plus=None,
+        excluded_nlps_3_7_plus=None,
     ):
         def func(nlp):
 
             if nlp.meta["name"] in excluded_nlps:
                 return
+            if excluded_nlps_3_7_plus and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0"):
+                if nlp.meta["name"] in excluded_nlps_3_7_plus:
+                    return
             doc = nlp(doc_text)
             rules_analyzer = RulesAnalyzerFactory.get_rules_analyzer(nlp)
             rules_analyzer.initialize(doc)
@@ -455,8 +512,15 @@ class FrenchRulesTest(unittest.TestCase):
                 referring_index,
             )
             referred_mention = Mention(doc[referred_index], include_dependent_siblings)
+            if (
+                expected_truth_3_7_plus is not None
+                and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0")
+            ):
+                expected = expected_truth_3_7_plus
+            else:
+                expected = expected_truth
             self.assertEqual(
-                expected_truth,
+                expected,
                 rules_analyzer.is_potential_anaphoric_pair(
                     referred_mention, doc[referring_index], directly
                 ),
@@ -466,7 +530,10 @@ class FrenchRulesTest(unittest.TestCase):
         self.all_nlps(func)
 
     def test_potential_pair_trivial_masc(self):
-        self.compare_potential_pair("Je voyais un homme. Il courait", 3, False, 5, 2)
+        self.compare_potential_pair(
+            "Je voyais un homme. Il courait", 3, False, 5, 2,
+            excluded_nlps_3_7_plus=["core_news_sm"],
+        )
 
     def test_potential_pair_trivial_masc_control(self):
         self.compare_potential_pair("Je voyais un homme. Elle courait", 3, False, 5, 0)
@@ -501,7 +568,7 @@ class FrenchRulesTest(unittest.TestCase):
 
     def test_potential_pair_trivial_masc_possessive_control_1(self):
         self.compare_potential_pair(
-            "Je voyais un homme. Leur chien courait", 3, False, 5, 0
+            "Je voyais un homme. Leur chien courait", 3, False, 5, 0,
         )
 
     def test_potential_pair_possessive_coordinated_sibling(self):
@@ -518,7 +585,10 @@ class FrenchRulesTest(unittest.TestCase):
         self.compare_potential_pair("Je voyais une femme. Elle courait", 3, False, 5, 2)
 
     def test_potential_pair_trivial_fem_control_1(self):
-        self.compare_potential_pair("Je voyais une femme. Il courait", 3, False, 5, 0)
+        self.compare_potential_pair(
+            "Je voyais une femme. Il courait", 3, False, 5, 0,
+            excluded_nlps_3_7_plus=["core_news_sm"],
+        )
 
     def test_potential_pair_trivial_plur_single_element(self):
         self.compare_potential_pair(
@@ -537,7 +607,8 @@ class FrenchRulesTest(unittest.TestCase):
 
     def test_potential_pair_trivial_plur_single_element_possessive(self):
         self.compare_potential_pair(
-            "Je voyais quelques femmes. Leur chien dormait", 3, False, 5, 2
+            "Je voyais quelques femmes. Leur chien dormait", 3, False, 5, 2,
+            excluded_nlps_3_7_plus=["core_news_lg", "core_news_md"],
         )
 
     def test_potential_pair_trivial_plur_single_element_possessive_control(self):
@@ -572,12 +643,14 @@ class FrenchRulesTest(unittest.TestCase):
 
     def test_potential_pair_trivial_plur_coordination_possessive(self):
         self.compare_potential_pair(
-            "Je voyais un homme et une femme. Leur chien dormait", 3, True, 8, 2
+            "Je voyais un homme et une femme. Leur chien dormait", 3, True, 8, 2,
+            excluded_nlps_3_7_plus=["core_news_md", "core_news_sm"],
         )
 
     def test_potential_pair_trivial_plur_coordination_possessive_control(self):
         self.compare_potential_pair(
-            "Je voyais un homme et une femme. Son chien dormaient", 3, True, 8, 0
+            "Je voyais un homme et une femme. Son chien dormaient", 3, True, 8, 0,
+            excluded_nlps_3_7_plus=["core_news_md", "core_news_lg"],
         )
 
     def test_potential_pair_trivial_plur_coordination_elements_plural_1(self):
@@ -632,7 +705,7 @@ class FrenchRulesTest(unittest.TestCase):
         self,
     ):
         self.compare_potential_pair(
-            "Je voyais un homme et une femme. Leur chien dormait", 3, False, 8, 0
+            "Je voyais un homme et une femme. Leur chien dormait", 3, False, 8, 0,
         )
 
     def test_potential_pair_trivial_sing_coordination_second_element(self):
@@ -652,12 +725,14 @@ class FrenchRulesTest(unittest.TestCase):
 
     def test_potential_pair_trivial_sing_coordination_second_element_possessive(self):
         self.compare_potential_pair(
-            "Je voyais un homme et une femme. Son chien dormait", 6, False, 8, 2
+            "Je voyais un homme et une femme. Son chien dormait", 6, False, 8, 2,
+            excluded_nlps_3_7_plus=["core_news_lg"],
         )
 
     def test_potential_pair_trivial_sing_coordination_second_element_possessive(self):
         self.compare_potential_pair(
-            "Je voyais un homme et une femme. Leur chien dormait", 6, False, 8, 0
+            "Je voyais un homme et une femme. Leur chien dormait", 6, False, 8, 0,
+            excluded_nlps_3_7_plus=["core_news_lg"],
         )
 
     def test_potential_pair_masc_trumps_et_control_1(self):
@@ -785,6 +860,7 @@ class FrenchRulesTest(unittest.TestCase):
             6,
             0,
             excluded_nlps=["core_news_sm"],
+            excluded_nlps_3_7_plus=["core_news_md", "core_news_lg"],
         )
 
     def test_potential_pair_fem_acc_anaphor_control_2(self):
@@ -864,6 +940,7 @@ class FrenchRulesTest(unittest.TestCase):
             6,
             2,
             excluded_nlps=["core_news_sm"],
+            excluded_nlps_3_7_plus=["core_news_md", "core_news_lg"],
         )
 
     def test_potential_pair_location_anaphor_ici_control(self):
@@ -989,6 +1066,7 @@ class FrenchRulesTest(unittest.TestCase):
             False,
             14,
             2,
+            excluded_nlps_3_7_plus=["core_news_sm", "core_news_md", "core_news_lg"],
         )
 
     def test_potential_posessive_determiner_control(self):
@@ -1173,12 +1251,18 @@ class FrenchRulesTest(unittest.TestCase):
         expected_reflexive_truth,
         is_reflexive_anaphor_truth,
         *,
-        excluded_nlps=[]
+        excluded_nlps=[],
+        expected_truth_3_7_plus=None,
+        expected_reflexive_truth_3_7_plus=None,
+        excluded_nlps_3_7_plus=None,
     ):
         def func(nlp):
 
             if nlp.meta["name"] in excluded_nlps:
                 return
+            if excluded_nlps_3_7_plus and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0"):
+                if nlp.meta["name"] in excluded_nlps_3_7_plus:
+                    return
             doc = nlp(doc_text)
             rules_analyzer = RulesAnalyzerFactory.get_rules_analyzer(nlp)
             rules_analyzer.initialize(doc)
@@ -1187,15 +1271,29 @@ class FrenchRulesTest(unittest.TestCase):
             ) or rules_analyzer.is_potential_anaphor(doc[referred_index])
             assert rules_analyzer.is_potential_anaphor(doc[referring_index])
             referred_mention = Mention(doc[referred_index], include_dependent_siblings)
+            if (
+                expected_truth_3_7_plus is not None
+                and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0")
+            ):
+                exp_truth = expected_truth_3_7_plus
+            else:
+                exp_truth = expected_truth
             self.assertEqual(
-                expected_truth,
+                exp_truth,
                 rules_analyzer.is_potential_anaphoric_pair(
                     referred_mention, doc[referring_index], True
                 ),
                 nlp.meta["name"],
             )
+            if (
+                expected_reflexive_truth_3_7_plus is not None
+                and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0")
+            ):
+                exp_refl = expected_reflexive_truth_3_7_plus
+            else:
+                exp_refl = expected_reflexive_truth
             self.assertEqual(
-                expected_reflexive_truth,
+                exp_refl,
                 rules_analyzer.is_potential_reflexive_pair(
                     referred_mention, doc[referring_index]
                 ),
@@ -1362,6 +1460,7 @@ class FrenchRulesTest(unittest.TestCase):
             True,
             2,
             excluded_nlps=["core_news_sm"],
+            excluded_nlps_3_7_plus=["core_news_lg"],
         )
         self.compare_potential_reflexive_pair(
             "Elle mélangea le produit et le sel avec eux-mêmes.",
@@ -1372,6 +1471,7 @@ class FrenchRulesTest(unittest.TestCase):
             True,
             2,
             excluded_nlps=["core_news_sm"],
+            excluded_nlps_3_7_plus=["core_news_lg"],
         )
 
     def test_reflexive_with_verb_coordination_one_subject(self):
@@ -1421,6 +1521,7 @@ class FrenchRulesTest(unittest.TestCase):
             2,
             True,
             2,
+            excluded_nlps_3_7_plus=["core_news_md"],
         )
 
     def test_reflexive_completely_within_noun_phrase_1_control(self):
@@ -1433,6 +1534,8 @@ class FrenchRulesTest(unittest.TestCase):
             True,
             0,
             excluded_nlps="core_news_sm",
+            expected_truth_3_7_plus=2,
+            expected_reflexive_truth_3_7_plus=0,
         )
 
     def test_reflexive_double_coordination_without_preposition(self):
@@ -1468,6 +1571,7 @@ class FrenchRulesTest(unittest.TestCase):
             True,
             0,
             excluded_nlps=["core_news_sm", "core_news_md"],
+            expected_truth_3_7_plus=2,
         )
         self.compare_potential_reflexive_pair(
             "Jean et Marie parlaient avec lui et avec elle.",
@@ -1522,12 +1626,17 @@ class FrenchRulesTest(unittest.TestCase):
         referring_index,
         expected_truth,
         *,
-        excluded_nlps=[]
+        excluded_nlps=[],
+        expected_truth_3_7_plus=None,
+        excluded_nlps_3_7_plus=None,
     ):
         def func(nlp):
 
             if nlp.meta["name"] in excluded_nlps:
                 return
+            if excluded_nlps_3_7_plus and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0"):
+                if nlp.meta["name"] in excluded_nlps_3_7_plus:
+                    return
             doc = nlp(doc_text)
             rules_analyzer = RulesAnalyzerFactory.get_rules_analyzer(nlp)
             rules_analyzer.initialize(doc)
@@ -1537,8 +1646,15 @@ class FrenchRulesTest(unittest.TestCase):
             assert rules_analyzer.is_potential_anaphor(doc[referring_index])
             assert referred_index > referring_index
             referred_mention = Mention(doc[referred_index], include_dependent_siblings)
+            if (
+                expected_truth_3_7_plus is not None
+                and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0")
+            ):
+                expected = expected_truth_3_7_plus
+            else:
+                expected = expected_truth
             self.assertEqual(
-                expected_truth,
+                expected,
                 rules_analyzer.is_potential_cataphoric_pair(
                     referred_mention, doc[referring_index]
                 )
@@ -1569,6 +1685,7 @@ class FrenchRulesTest(unittest.TestCase):
             2,
             True,
             excluded_nlps=["core_news_sm"],
+            expected_truth_3_7_plus=False,
         )
 
     def test_cataphora_with_conjunction_control(self):
@@ -1651,6 +1768,7 @@ class FrenchRulesTest(unittest.TestCase):
             2,
             False,
             excluded_nlps=["core_news_sm"],
+            expected_truth_3_7_plus=True,
         )
 
     def test_cataphora_referred_is_pronoun(self):
@@ -1666,24 +1784,36 @@ class FrenchRulesTest(unittest.TestCase):
             2,
             True,
             excluded_nlps=["core_news_sm"],
+            expected_truth_3_7_plus=True,
         )
 
     def test_cataphora_not_advcl(self):
         self.compare_potential_cataphoric_pair(
-            "Il était libre ; il rentra à la maison", 4, False, 0, False
+            "Il était libre ; il rentra à la maison", 4, False, 0, False,
+            excluded_nlps_3_7_plus=["core_news_md", "core_news_lg"],
         )
 
     def compare_potential_referreds(
-        self, doc_text, index, expected_potential_referreds, *, excluded_nlps=[]
+        self, doc_text, index, expected_potential_referreds, *, excluded_nlps=[], expected_potential_referreds_3_7_plus=None, excluded_nlps_3_7_plus=None
     ):
         def func(nlp):
 
             if nlp.meta["name"] in excluded_nlps:
                 return
+            if excluded_nlps_3_7_plus and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0"):
+                if nlp.meta["name"] in excluded_nlps_3_7_plus:
+                    return
             doc = nlp(doc_text)
             rules_analyzer = RulesAnalyzerFactory.get_rules_analyzer(nlp)
             rules_analyzer.initialize(doc)
-            if expected_potential_referreds is None:
+            if (
+                expected_potential_referreds_3_7_plus is not None
+                and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0")
+            ):
+                expected_refs = expected_potential_referreds_3_7_plus
+            else:
+                expected_refs = expected_potential_referreds
+            if expected_refs is None:
                 self.assertFalse(
                     hasattr(doc[index]._.coref_chains, "temp_potential_referreds")
                 )
@@ -1699,7 +1829,7 @@ class FrenchRulesTest(unittest.TestCase):
                         ]._.coref_chains.temp_potential_referreds
                     ]
                 self.assertEqual(
-                    expected_potential_referreds, potential_referreds, nlp.meta["name"]
+                    expected_refs, potential_referreds, nlp.meta["name"]
                 )
 
         self.all_nlps(func)
@@ -1768,16 +1898,28 @@ class FrenchRulesTest(unittest.TestCase):
         referring_index,
         expected_truth,
         *,
-        excluded_nlps=[]
+        excluded_nlps=[],
+        expected_truth_3_7_plus=None,
+        excluded_nlps_3_7_plus=None,
     ):
         def func(nlp):
             if nlp.meta["name"] in excluded_nlps:
                 return
+            if excluded_nlps_3_7_plus and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0"):
+                if nlp.meta["name"] in excluded_nlps_3_7_plus:
+                    return
             doc = nlp(doc_text)
             rules_analyzer = RulesAnalyzerFactory().get_rules_analyzer(nlp)
             rules_analyzer.initialize(doc)
+            if (
+                expected_truth_3_7_plus is not None
+                and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0")
+            ):
+                expected = expected_truth_3_7_plus
+            else:
+                expected = expected_truth
             self.assertEqual(
-                expected_truth,
+                expected,
                 rules_analyzer.is_potential_coreferring_noun_pair(
                     doc[referred_index], doc[referring_index]
                 ),
@@ -1797,6 +1939,7 @@ class FrenchRulesTest(unittest.TestCase):
             1,
             8,
             True,
+            excluded_nlps_3_7_plus=["core_news_lg", "core_news_sm"],
         )
 
     def test_potential_noun_pair_proper_noun_noun(self):

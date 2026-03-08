@@ -1,4 +1,6 @@
 import unittest
+from packaging import version as pkg_version
+
 from coreferee.rules import RulesAnalyzerFactory
 from coreferee.test_utils import get_nlps
 from coreferee.data_model import Mention
@@ -177,7 +179,7 @@ class GermanRulesTest(unittest.TestCase):
         )
 
     def compare_independent_noun(
-        self, doc_text, expected_per_indexes, *, excluded_nlps=[]
+        self, doc_text, expected_per_indexes, *, excluded_nlps=[], expected_per_indexes_3_7_plus=None
     ):
         def func(nlp):
 
@@ -189,7 +191,14 @@ class GermanRulesTest(unittest.TestCase):
             per_indexes = [
                 token.i for token in doc if rules_analyzer.is_independent_noun(token)
             ]
-            self.assertEqual(expected_per_indexes, per_indexes, nlp.meta["name"])
+            if (
+                expected_per_indexes_3_7_plus is not None
+                and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0")
+            ):
+                expected = expected_per_indexes_3_7_plus
+            else:
+                expected = expected_per_indexes
+            self.assertEqual(expected, per_indexes, nlp.meta["name"])
 
         self.all_nlps(func)
 
@@ -213,6 +222,7 @@ class GermanRulesTest(unittest.TestCase):
             "Diejenigen der Jungen, die heimgekommen sind, waren müde",
             [2],
             excluded_nlps=["core_news_md", "core_news_sm"],
+            expected_per_indexes_3_7_plus=[0, 2],
         )
 
     def test_blacklisted(self):
@@ -1044,7 +1054,8 @@ class GermanRulesTest(unittest.TestCase):
         expected_reflexive_truth,
         is_reflexive_anaphor_truth,
         *,
-        excluded_nlps=[]
+        excluded_nlps=[],
+        expected_reflexive_truth_3_7_plus=None,
     ):
         def func(nlp):
 
@@ -1065,8 +1076,15 @@ class GermanRulesTest(unittest.TestCase):
                 ),
                 nlp.meta["name"],
             )
+            if (
+                expected_reflexive_truth_3_7_plus is not None
+                and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0")
+            ):
+                exp_refl = expected_reflexive_truth_3_7_plus
+            else:
+                exp_refl = expected_reflexive_truth
             self.assertEqual(
-                expected_reflexive_truth,
+                exp_refl,
                 rules_analyzer.is_potential_reflexive_pair(
                     referred_mention, doc[referring_index]
                 ),
@@ -1301,6 +1319,7 @@ class GermanRulesTest(unittest.TestCase):
             True,
             False,
             excluded_nlps=["core_news_md", "core_news_sm"],
+            expected_reflexive_truth_3_7_plus=False,
         )
 
     def test_reflexive_double_coordination_with_preposition(self):

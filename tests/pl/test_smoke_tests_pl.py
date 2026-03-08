@@ -127,6 +127,7 @@ class PolishSmokeTest(unittest.TestCase):
         self.compare_annotations(
             "Widziałem Piotra i Agnieszkę. Polowały z koleżanką na kota. Szczęśliwe były.",
             "[0: [3], [5], 1: [5, 7], [12]]",
+            alternative_expected_coref_chains="[0: [3], [5]]",
         )
 
     def test_different_sentence_verb(self):

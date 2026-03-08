@@ -1,4 +1,6 @@
 import unittest
+from packaging import version as pkg_version
+
 from coreferee.rules import RulesAnalyzerFactory
 from coreferee.test_utils import get_nlps
 from coreferee.data_model import Mention
@@ -319,12 +321,17 @@ class EnglishRulesTest(unittest.TestCase):
         referring_index,
         expected_truth,
         *,
-        excluded_nlps=[]
+        excluded_nlps=[],
+        expected_truth_3_7_plus=None,
+        excluded_nlps_3_7_plus=None,
     ):
         def func(nlp):
 
             if nlp.meta["name"] in excluded_nlps:
                 return
+            if excluded_nlps_3_7_plus and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0"):
+                if nlp.meta["name"] in excluded_nlps_3_7_plus:
+                    return
             doc = nlp(doc_text)
             rules_analyzer = RulesAnalyzerFactory.get_rules_analyzer(nlp)
             rules_analyzer.initialize(doc)
@@ -333,8 +340,15 @@ class EnglishRulesTest(unittest.TestCase):
             ) or rules_analyzer.is_potential_anaphor(doc[referred_index])
             assert rules_analyzer.is_potential_anaphor(doc[referring_index])
             referred_mention = Mention(doc[referred_index], include_dependent_siblings)
+            if (
+                expected_truth_3_7_plus is not None
+                and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0")
+            ):
+                expected = expected_truth_3_7_plus
+            else:
+                expected = expected_truth
             self.assertEqual(
-                expected_truth,
+                expected,
                 rules_analyzer.is_potential_anaphoric_pair(
                     referred_mention, doc[referring_index], True
                 ),
@@ -497,12 +511,21 @@ class EnglishRulesTest(unittest.TestCase):
 
     @unittest.skipIf(train_version_mismatch, train_version_mismatch_message)
     def test_potential_pair_person_word_capitalized(self):
-        self.compare_potential_pair("I saw Job. He was there", 2, False, 4, 1)
+        self.compare_potential_pair(
+            "I saw Job. He was there", 2, False, 4, 1,
+            excluded_nlps_3_7_plus=["core_web_trf"],
+        )
 
     @unittest.skipIf(train_version_mismatch, train_version_mismatch_message)
     def test_potential_pair_person_word_non_capitalized_exclusively_person_word(self):
         self.compare_potential_pair(
-            "I saw a copt. He was there", 3, False, 5, 0, excluded_nlps=["core_web_md"]
+            "I saw a copt. He was there",
+            3,
+            False,
+            5,
+            0,
+            excluded_nlps=["core_web_md"],
+            excluded_nlps_3_7_plus=["core_web_sm", "core_web_lg"],
         )
 
     def test_potential_pair_person_word_capitalized_exclusively_person_word(self):

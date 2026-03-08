@@ -44,10 +44,30 @@ jobs:
             python_version: '3.10'
             spacy_version: '3.0.9'
             click_version: '7.1.2'
+          # python 3.11 / spacy 3.7|3.8
+          - os: 'ubuntu-20.04'
+            python_version: '3.11'
+            spacy_version: '3.7.5'
+            click_version: '8.3.1'
+          - os: 'ubuntu-20.04'
+            python_version: '3.11'
+            spacy_version: '3.8.11'
+            click_version: '8.3.1'
+          # python 3.12 / spacy 3.7|3.8
+          - os: 'ubuntu-20.04'
+            python_version: '3.12'
+            spacy_version: '3.7.5'
+            click_version: '8.3.1'
+          - os: 'ubuntu-20.04'
+            python_version: '3.12'
+            spacy_version: '3.8.11'
+            click_version: '8.3.1'
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout repository code
       uses: actions/checkout@v3
+      with:
+          ref: master
 
     - name: Initialize Python
       uses: actions/setup-python@v3
@@ -80,7 +100,7 @@ jobs:
         python -m spacy download fr_core_news_lg
         python -m spacy download pl_core_news_md
         python -m spacy download pl_core_news_lg
-        
+
     - name: Install Coreferee
       run: |
         cd ${{ github.workspace }}
@@ -98,6 +118,6 @@ jobs:
         python -m pytest tests/pl
 
     - name: Test Coreferee (French)
-      if: matrix.spacy_version == '3.1.7' ||  matrix.spacy_version == '3.2.6'
+      if: matrix.spacy_version == '3.1.7' ||  matrix.spacy_version == '3.2.6' || matrix.spacy_version == '3.7.5' || matrix.spacy_version == '3.8.11'
       run: |
         python -m pytest tests/fr

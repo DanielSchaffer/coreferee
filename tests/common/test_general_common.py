@@ -25,8 +25,15 @@ class Worker:
 class CommonGeneralTest(unittest.TestCase):
     def setUp(self):
         nlps = get_nlps("en")
+        self.sm_nlp = None
         for nlp in (nlp for nlp in nlps if nlp.meta["name"] == "core_web_sm"):
             self.sm_nlp = nlp
+            break
+        if self.sm_nlp is None:
+            self.skipTest(
+                "No en_core_web_sm model available for this spaCy version "
+                "(check lang/en/config.cfg from_version/to_version)."
+            )
 
     def test_serialization_with_scoring(self):
         doc = self.sm_nlp("Peter told Paul he was dissatisfied.")

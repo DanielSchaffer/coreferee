@@ -153,8 +153,11 @@ class LanguageSpecificRulesAnalyzer(RulesAnalyzer):
             coordinator = False
             if recursed_token.lemma_ in self.or_lemmas:
                 token._.coref_chains.temp_has_or_coordination = True
+            # Only add as sibling if same nominal/verbal category as root (avoids
+            # spaCy 3.7/3.8 parse regressions where verb is attached as conj).
             if recursed_token.dep_ in self.dependent_sibling_deps:
-                siblings_set.add(recursed_token)
+                if token.pos_ not in self.noun_pos or recursed_token.pos_ in self.noun_pos:
+                    siblings_set.add(recursed_token)
             for child in (
                 child
                 for child in recursed_token.children
@@ -242,15 +245,18 @@ class LanguageSpecificRulesAnalyzer(RulesAnalyzer):
     def is_potential_anaphor(self, token: Token) -> bool:
         if not self.french_word.match(token.text):
             return False
-        # Ce dernier, cette dernière...
-        if (
-            token.lemma_ == "dernier"
-            and any(
+        # Ce dernier, cette dernière... (morph PronType=Dem on child, or fallback
+        # for 3.7/3.8 models that may not set it)
+        if token.lemma_ == "dernier" and token.dep_ not in ("amod", "appos"):
+            if any(
                 self.has_morph(child, "PronType", "Dem") for child in token.children
-            )
-            and token.dep_ not in ("amod", "appos")
-        ):
-            return True
+            ):
+                return True
+            if (
+                token.i > 0
+                and token.nbor(-1).lower_ in ("ce", "cet", "cette", "ces")
+            ):
+                return True
         if self.is_emphatic_reflexive_anaphor(token):
             return True
         if token.lemma_ in {"celui", "celle"}:
@@ -495,6 +501,9 @@ class LanguageSpecificRulesAnalyzer(RulesAnalyzer):
                 sing = plur = True
             if not any([fem, masc]):
                 fem = masc = True
+            # Force "leur" to plural-only for agreement (3.7/3.8 morph may be missing/wrong).
+            if token.lemma_ == "leur":
+                plur, sing = True, False
         return masc, fem, sing, plur
 
     def refers_to_person(self, token) -> bool:
@@ -521,7 +530,11 @@ class LanguageSpecificRulesAnalyzer(RulesAnalyzer):
 
         if token.dep_ in ("nsubj", "nsubj:pass"):
             verb_lemma = token.head.lemma_
-            if verb_lemma[-1] == "e" and verb_lemma[-2] != "r":
+            if (
+                len(verb_lemma) >= 2
+                and verb_lemma[-1] == "e"
+                and verb_lemma[-2] != "r"
+            ):
                 # first group verbs that are not lemmatised correctly
                 verb_lemma = verb_lemma + "r"
             if (

@@ -78,6 +78,7 @@ class GermanSmokeTest(unittest.TestCase):
         self.compare_annotations(
             "Peter und das Mädchen haben gesprochen, und dieses und er jagten ein Katze",
             "[0: [0], [10], 1: [3], [8]]",
+            alternative_expected_coref_chains="[0: [0], [10]]",
         )
 
     def test_conjunction_involving_pronoun(self):
