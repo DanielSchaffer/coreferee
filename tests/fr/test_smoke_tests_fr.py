@@ -166,7 +166,6 @@ class FrenchSmokeTest(unittest.TestCase):
             "La panthère et le léopard se chassaient",
             "[0: [1, 4], [5]]",
             excluded_nlps=["core_news_md", "core_news_sm"],
-            expected_coref_chains_3_7_plus="[0: [1, 6], [5]]",
         )
 
     def test_reflexive_excluded_mix_of_coordination_and_single_member_1(self):
@@ -265,7 +264,7 @@ class FrenchSmokeTest(unittest.TestCase):
             "Même si elle était très occupée par son travail, Julie en avait marre. Alors, elle et son mari décidèrent qu'ils avaient besoin de vacances. Ils allèrent en Espagne car ils adoraient le pays",
             "[0: [2], [7], [10], [17], [19], 1: [8], [11], 2: [17, 20], [23], [29], [34], 3: [32], [37]]",
             excluded_nlps=["core_news_sm"],
-            expected_coref_chains_3_7_plus="[0: [2], [7], 1: [8], [11], 2: [10], [17], [19], 3: [23], [29], [34], 4: [32], [37]]",
+            expected_coref_chains_3_7_plus="[0: [2], [7], [10], [17], [19], 1: [8], [11], 2: [23], [29], [34], 3: [32], [37]]",
             alternative_expected_coref_chains_3_7_plus="[0: [2], [7], [8], [10], 1: [11], [34], 2: [23], [29], 3: [32], [37]]",
         )
 

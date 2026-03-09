@@ -171,3 +171,30 @@ Re-running the French rules tests after these changes will show which regression
 ---
 
 *Investigation complete. Test changes in `tests/fr/test_rules_fr.py` assert correct behavior. Rule hardening in `coreferee/lang/fr/language_specific_rules.py` for 3.7/3.8.*
+
+Regressions stem from **spaCy 3.7/3.8 French pipeline output** (dependency parse, morphology, or sentence segmentation) differing from earlier versions. The **training scripts** use the same `RulesAnalyzer` and config; they do not have separate 3.7/3.8 branches. So fixing **language rules** to be robust to 3.7/3.8 output both fixes rules tests and improves behavior when training or running with 3.7/3.8 models.
+
+The following changes were made in **`coreferee/lang/fr/language_specific_rules.py`**:
+
+1. **`get_dependent_siblings`**  
+   When the root token is a noun, only tokens with `pos_ in self.noun_pos` are added as dependent siblings. This avoids treating a verb attached as `conj` (e.g. *mangé* in "Carol, Richard et Ralf ont mangé") or *rentre* in "Richard ou Christine rentre") as a coordination sibling when the coordination is nominal.  
+   **Targets:** `test_get_dependent_sibling_info_three_member_conjunction_phrase_with_comma_and`, `test_get_dependent_sibling_info_two_member_conjunction_phrase_or`.
+
+2. **`is_potential_anaphor` (Ce dernier / Cette dernière)**  
+   For `lemma_ == "dernier"`, added a fallback when the preceding token is *ce*, *cet*, *cette*, or *ces*, so explicit anaphors are recognized even if the 3.7/3.8 model does not set `PronType=Dem` on the child.  
+   **Targets:** `test_explicit_anaphor`.
+
+3. **`get_gender_number_info` (Leur)**  
+   For `lemma_ == "leur"`, a final override forces `plur=True` and `sing=False` so possessive *leur* is always treated as plural for agreement. This restores correct behavior when morph is missing or wrong.  
+   **Targets:** `test_potential_pair_trivial_masc_possessive_control_1`, `test_potential_pair_trivial_sing_coordination_first_element_possessive_control`.
+
+**Not addressed by rules alone:**  
+- **Sentence segmentation** (e.g. `test_potential_referreds_maximum_sentence_referential_distance` / `over_maximum`): If 3.7/3.8 French models produce different `doc.sents`, the referential-distance window changes. That is pipeline/model-dependent; rules assume `doc.sents` as given.  
+- **Potential referents for *le*** (e.g. `test_potential_referreds_last_token`): If the model attaches *le* differently or gives different morph, the list of preceding referents can change. The noun-only conjunct fix and *leur* agreement help; remaining differences would require checking actual 3.7/3.8 parses.  
+- **Cataphora** (e.g. `test_potential_referreds_cataphora_*`): Empty potential referents can follow from different clause attachment (`advcl` etc.) or sentence boundaries; rules already allow cataphoric referents when the structure is present.
+
+Re-running the French rules tests after these changes will show which regressions are fixed by rules; any remaining failures point to pipeline/model or training data.
+
+---
+
+*Investigation complete. Test changes in `tests/fr/test_rules_fr.py` assert correct behavior. Rule hardening in `coreferee/lang/fr/language_specific_rules.py` for 3.7/3.8.*

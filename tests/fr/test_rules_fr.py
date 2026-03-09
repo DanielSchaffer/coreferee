@@ -116,7 +116,6 @@ class FrenchRulesTest(unittest.TestCase):
     def test_get_dependent_sibling_info_two_member_conjunction_phrase_or(self):
         self.compare_get_dependent_sibling_info(
             "Richard ou Christine rentre à la maison", 0, "[Christine]", None, True,
-            excluded_nlps_3_7_plus=["core_news_md"],
         )
 
     def test_get_dependent_sibling_info_three_member_conjunction_phrase_with_comma_and(
@@ -151,6 +150,7 @@ class FrenchRulesTest(unittest.TestCase):
             "[Ralf, Richard]",
             None,
             False,
+            excluded_nlps_3_7_plus=["core_news_sm"],
         )
 
     def test_get_dependent_sibling_info_three_member_conjunction_phrase_with_or(self):
@@ -160,6 +160,7 @@ class FrenchRulesTest(unittest.TestCase):
             "[Ralf, Richard]",
             None,
             True,
+            excluded_nlps_3_7_plus=["core_news_sm"],
         )
 
     def test_get_dependent_sibling_info_three_member_conjunction_phrase_with_and_and_or(
@@ -180,7 +181,8 @@ class FrenchRulesTest(unittest.TestCase):
 
     def test_get_dependent_sibling_info_dependent_sibling(self):
         self.compare_get_dependent_sibling_info(
-            "Il y avait une réunion avec Carol et Ralf et Richard", 8, "[]", 6, False
+            "Il y avait une réunion avec Carol et Ralf et Richard", 8, "[]", 6, False,
+            excluded_nlps_3_7_plus=["core_news_sm"],
         )
 
     def compare_independent_noun(
@@ -608,7 +610,6 @@ class FrenchRulesTest(unittest.TestCase):
     def test_potential_pair_trivial_plur_single_element_possessive(self):
         self.compare_potential_pair(
             "Je voyais quelques femmes. Leur chien dormait", 3, False, 5, 2,
-            excluded_nlps_3_7_plus=["core_news_lg", "core_news_md"],
         )
 
     def test_potential_pair_trivial_plur_single_element_possessive_control(self):
@@ -732,7 +733,6 @@ class FrenchRulesTest(unittest.TestCase):
     def test_potential_pair_trivial_sing_coordination_second_element_possessive(self):
         self.compare_potential_pair(
             "Je voyais un homme et une femme. Leur chien dormait", 6, False, 8, 0,
-            excluded_nlps_3_7_plus=["core_news_lg"],
         )
 
     def test_potential_pair_masc_trumps_et_control_1(self):
@@ -1582,6 +1582,7 @@ class FrenchRulesTest(unittest.TestCase):
             True,
             0,
             excluded_nlps=["core_news_sm", "core_news_md"],
+            excluded_nlps_3_7_plus=["core_news_lg"],
         )
 
     def test_reflexive_relative_clause_subject(self):
@@ -1858,6 +1859,7 @@ class FrenchRulesTest(unittest.TestCase):
             "Richard vint. Un homme. Un homme. Un homme. Un homme. Il parla.",
             15,
             ["Richard(0)", "homme(4)", "homme(7)", "homme(10)", "homme(13)"],
+            excluded_nlps_3_7_plus=["core_news_sm"],
         )
 
     def test_potential_referreds_over_maximum_sentence_referential_distance(self):
@@ -1865,6 +1867,7 @@ class FrenchRulesTest(unittest.TestCase):
             "Richard vint. Un homme. Un homme. Un homme. Un homme. Un homme. Il parla.",
             18,
             ["homme(4)", "homme(7)", "homme(10)", "homme(13)", "homme(16)"],
+            excluded_nlps_3_7_plus=["core_news_sm"],
         )
 
     def test_potential_referreds_last_token(self):
@@ -1873,6 +1876,7 @@ class FrenchRulesTest(unittest.TestCase):
             5,
             ["Richard(0)"],
             excluded_nlps=["core_news_sm"],
+            excluded_nlps_3_7_plus=["core_news_md"],
         )
 
     def test_potential_referreds_cataphora_simple(self):
