@@ -166,7 +166,7 @@ class TrainingManager:
         with open(setup_cfg_filename, "w") as setup_cfg_file:
             self.writeln(setup_cfg_file, "[metadata]")
             self.writeln(setup_cfg_file, "name = ", package_dirname.replace("_", "-"))
-            self.writeln(setup_cfg_file, "version = 1.0.0")
+            self.writeln(setup_cfg_file, "version = 1.5.0")
             self.writeln(setup_cfg_file)
             self.writeln(setup_cfg_file, "[options]")
             self.writeln(setup_cfg_file, "packages = find:")

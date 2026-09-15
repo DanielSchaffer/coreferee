@@ -50,9 +50,11 @@ Author: [Richard Paul Hudson](https://github.com/richardpaulhudson)
 
 Coreferences are situations where two or more words within a text refer to the same entity, e.g. _**John** went home because **he** was tired_. Resolving coreferences is an important general task within the natural language processing field.
 
-Coreferee is a Python 3 library (tested with versions 3.10—3.13) that is used together with [spaCy](https://spacy.io/) (tested with versions 3.2.0—3.8.16) to resolve coreferences within English, French, German and Polish texts. It is designed so that it is easy to add support for new languages. It uses a mixture of neural networks and programmed rules.
+Coreferee is a Python 3 library for resolving coreferences in English, French, German and Polish texts using spaCy. It is designed to work effectively with the relatively limited amounts of annotated coreference data available for many languages. Language-specific grammatical rules eliminate implausible antecedents, while a neural ensemble using spaCy's syntactic, morphological and vector representations ranks the remaining candidates. The architecture separates language-specific rules from the common inference machinery, making it straightforward to add support for further languages.
 
-Note that for size reasons the models shipped with Coreferee do not support all previous spaCy versions with all languages. If you want to use Coreferee with an older spaCy version that is not supported, please check out a tag for an appropriate previous Coreferee version (see [7. Version history](#version-history)).
+Coreference decisions are made in the context of the emerging coreference chain rather than independently. When adding a new mention, the annotator checks compatibility with other members of the chain; if a later decision exposes an inconsistency, it can backtrack over recent assignments and try alternative antecedents.
+
+Coreferee is tested with versions 3.10—3.13 and [spaCy](https://spacy.io/) versions 3.2.0—3.8.16.Note that for size reasons the models shipped with Coreferee do not support all previous spaCy versions with all languages. If you want to use Coreferee with an older spaCy version that is not supported, please check out a tag for an appropriate previous Coreferee version (see [7. Version history](#version-history)).
 
 The library was originally developed at [msg systems](https://www.msg.group/en) and was also maintained for a while at [Explosion AI](https://explosion.ai).
 
@@ -261,7 +263,7 @@ Coreferee started life to assist the [Holmes](https://github.com/msg-systems/hol
 
 #### 1.4 Facts and figures
 
-**Note that the following tables capture the accuracies measured when Coreferee was first written and evaluated. Time constraints meant it was not possible to carry out extensive evaluations for later spaCy versions, where the accuracies may differ.**
+**Note that the following tables capture the accuracies measured when Coreferee was first written and evaluated. Time constraints meant it was not possible to carry out extensive evaluations for later spaCy versions, where the accuracies may differ. Given the limited amount of annotated coreference data available at the time, the same held-out data was used both to determine when training should stop and to report the final accuracy figures. These results should therefore be regarded as indicative rather than fully independent benchmark results.**
 
 <a id="covered-relevant-linguistic-features"></a>
 
