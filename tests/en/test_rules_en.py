@@ -366,17 +366,17 @@ class EnglishRulesTest(unittest.TestCase):
             "I saw a man and a woman. They were walking", 3, True, 8, 2
         )
 
-    def test_potential_pair_coordinated_plural_nouns_second(self):
+    def test_potential_pair_coordinated_plural_nouns_first(self):
         self.compare_potential_pair(
             "I saw men and women. They were walking", 2, False, 6, 0
         )
 
-    def test_potential_pair_coordinated_plural_nouns_first(self):
+    def test_potential_pair_coordinated_plural_nouns_second(self):
         self.compare_potential_pair(
             "I saw men and women. They were walking", 4, False, 6, 0
         )
 
-    def test_potential_pair_coordinated_singular_nouns_first(self):
+    def test_potential_pair_coordinated_singular_nouns(self):
         self.compare_potential_pair(
             "I saw a man and a woman. They were walking", 3, False, 8, 0
         )
