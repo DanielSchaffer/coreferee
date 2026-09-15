@@ -2,6 +2,8 @@
 
 Author: [Richard Paul Hudson](https://github.com/richardpaulhudson)
 
+*Current status*: Coreferee is maintained for compatibility with current spaCy releases. The current release supports Python 3.10–3.13 and spaCy 3.2–3.8.
+
 - [1. Introduction](#introduction)
   - [1.1 The basic idea](#the-basic-idea)
   - [1.2 Getting started](#getting-started)
@@ -117,7 +119,7 @@ Note that the required command may be `python` rather than `python3` on some ope
 Then open a Python prompt (type `python3` or `python` at the command line):
 
 ```
->>> import coreferee, spacy
+>>> import spacy
 >>> nlp = spacy.load('fr_core_news_lg')
 >>> nlp.add_pipe('coreferee')
 <coreferee.manager.CorefereeBroker object at 0x000001F556B4FF10>
@@ -127,12 +129,15 @@ Then open a Python prompt (type `python3` or `python` at the command line):
 >>> doc._.coref_chains.print()
 0: elle(2), son(7), Julie(10), elle(17), son(19)
 1: travail(8), en(11)
-2: ils(23), Ils(29), ils(34)
+2: [elle(17); mari(20)], ils(23), Ils(29), ils(34)
 3: Espagne(32), pays(37)
 >>>
 >>> doc[17]._.coref_chains.print()
 0: elle(2), son(7), Julie(10), elle(17), son(19)
-2: ils(23), Ils(29), ils(34)
+2: [elle(17); mari(20)], ils(23), Ils(29), ils(34)
+>>>
+>>> doc._.coref_chains.resolve(doc[34])
+[Julie, mari]
 >>>
 ```
 
@@ -585,11 +590,9 @@ When a new minor spaCy release (e.g. 3.9) is supported, you need to: add config 
 
 3. **Training** — With the target spaCy version and all pipelines for that language installed, run the training command from the repository root (see [docs/TRAINING.md](docs/TRAINING.md)). Repeat per language and per minor version (e.g. 3.7 and 3.8) in a clean environment. Install the new models from the repo root with `python -m coreferee install <lang>`.
 
-4. **Tests** — Ensure the new model versions are loaded (config ranges), add or extend **conditional expected values** for the new versions where tests differ, and add snapshot branches for the common tendencies tests. Do not change expected values to match incorrect model output; treat wrong output as a regression to fix or document. See [AGENTS.md](AGENTS.md) and the project's agent skill for this workflow (if present) for detailed rules.
+4. **Tests** — Ensure the new model versions are loaded (config ranges), add or extend **conditional expected values** for the new versions where tests differ, and add snapshot branches for the common tendencies tests. Do not change expected values to match incorrect model output; treat wrong output as a regression to fix or document.
 
 5. **Regressions** — If the new pipeline produces linguistically wrong results, fix the cause (e.g. language rules or retraining) or document the limitation; do not adopt the wrong output as the new expected value. [docs/FR_REGression_Investigation.md](docs/FR_REGression_Investigation.md) illustrates the process.
-
-For detailed steps, version semantics, and test-update rules, use the **"Adding support for a new spaCy version"** agent skill (or AGENTS.md) rather than this section.
 
 <a id="version-history"></a>
 
@@ -696,7 +699,7 @@ The initial open-source version.
 
 ### 8. Open issues / requests for assistance
 
-1. Because the original contributor of the French rules is no longer involved in the project and the people who are still involved lack the necessary knowledge and intuitions to work with French, we have not been able to investigate test failures that have emerged with new spaCy versions as we would for the other languages; instead, we have simply excluded the tests for the versions in question. It would be most helpful if somebody could investigate the rules and tests further.
+1. French support for spaCy 3.7 and 3.8 has received less extensive validation than the other supported languages. The original contributor of the French rules is no longer involved in the project, and the current maintainers do not have sufficient native-level linguistic knowledge to evaluate all behavioural changes introduced by newer spaCy models. Some version-specific tests have therefore been excluded where their expected linguistic behaviour could not be established with confidence. Contributions from French speakers with relevant linguistic or NLP expertise would be particularly welcome.
 
 2. There are almost certainly changes to the inputs and structure of the neural ensemble that would lead to improvements in accuracy, both cross-linguistically and for specific languages. The only caveat to bear in mind when trying out changes is that it should be possible for someone who does not understand neural networks to write rules for a new language. This means that Coreferee should detect necessary differences in the neural network behaviour between languages automatically rather than requiring the trainer to configure them.
 
