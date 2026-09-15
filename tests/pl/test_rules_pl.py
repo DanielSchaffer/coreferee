@@ -37,7 +37,7 @@ class PolishRulesTest(unittest.TestCase):
         expected_governing_sibling,
         expected_has_or_coordination,
         *,
-        excluded_nlps=[]
+        excluded_nlps=[],
     ):
         def func(nlp):
 
@@ -338,7 +338,9 @@ class PolishRulesTest(unittest.TestCase):
         )
 
     def test_first_and_second_person_pronouns(self):
-        self.compare_potential_anaphor("Ja wiem, że ty go znasz", [5], excluded_nlps="core_news_lg")
+        self.compare_potential_anaphor(
+            "Ja wiem, że ty go znasz", [5], excluded_nlps="core_news_lg"
+        )
 
     @unittest.skipIf(train_version_mismatch, train_version_mismatch_message)
     def test_reflexive_non_clitic(self):
@@ -436,7 +438,9 @@ class PolishRulesTest(unittest.TestCase):
 
             if nlp.meta["name"] in excluded_nlps:
                 return
-            if excluded_nlps_3_7_plus and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0"):
+            if excluded_nlps_3_7_plus and pkg_version.parse(
+                nlp.meta["version"]
+            ) >= pkg_version.parse("3.7.0"):
                 if nlp.meta["name"] in excluded_nlps_3_7_plus:
                     return
             doc = nlp(doc_text)
@@ -447,10 +451,9 @@ class PolishRulesTest(unittest.TestCase):
             ) or rules_analyzer.is_potential_anaphor(doc[referred_index])
             assert rules_analyzer.is_potential_anaphor(doc[referring_index])
             referred_mention = Mention(doc[referred_index], include_dependent_siblings)
-            if (
-                expected_truth_3_7_plus is not None
-                and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0")
-            ):
+            if expected_truth_3_7_plus is not None and pkg_version.parse(
+                nlp.meta["version"]
+            ) >= pkg_version.parse("3.7.0"):
                 expected = expected_truth_3_7_plus
             else:
                 expected = expected_truth
@@ -706,21 +709,33 @@ class PolishRulesTest(unittest.TestCase):
     @unittest.skipIf(train_version_mismatch, train_version_mismatch_message)
     def test_nonvirile_verb_marked_2(self):
         self.compare_potential_pair(
-            "Psy weszły. Szczęśliwe były.", 0, False, 4, 2,
+            "Psy weszły. Szczęśliwe były.",
+            0,
+            False,
+            4,
+            2,
             excluded_nlps_3_7_plus=["core_news_lg"],
         )
 
     @unittest.skipIf(train_version_mismatch, train_version_mismatch_message)
     def test_nonvirile_verb_marked_3(self):
         self.compare_potential_pair(
-            "Domy weszły. Szczęśliwe były.", 0, False, 4, 2,
+            "Domy weszły. Szczęśliwe były.",
+            0,
+            False,
+            4,
+            2,
             excluded_nlps_3_7_plus=["core_news_lg"],
         )
 
     @unittest.skipIf(train_version_mismatch, train_version_mismatch_message)
     def test_nonvirile_verb_marked_4(self):
         self.compare_potential_pair(
-            "Dzieci weszły. Szczęśliwe były.", 0, False, 4, 2,
+            "Dzieci weszły. Szczęśliwe były.",
+            0,
+            False,
+            4,
+            2,
             excluded_nlps_3_7_plus=["core_news_lg"],
         )
 
@@ -1308,7 +1323,7 @@ class PolishRulesTest(unittest.TestCase):
         expected_reflexive_truth,
         is_reflexive_anaphor_truth,
         *,
-        excluded_nlps=[]
+        excluded_nlps=[],
     ):
         def func(nlp):
 
@@ -1506,7 +1521,14 @@ class PolishRulesTest(unittest.TestCase):
 
     def test_reflexive_with_to(self):
         self.compare_potential_reflexive_pair(
-            "Chcieli, żeby siebie chłopiec znał", 4, False, 3, 2, True, 2, excluded_nlps=["core_news_md"]
+            "Chcieli, żeby siebie chłopiec znał",
+            4,
+            False,
+            3,
+            2,
+            True,
+            2,
+            excluded_nlps=["core_news_md"],
         )
 
     def test_non_reflexive_in_wrong_situation_subordinate_clause(self):
@@ -1623,7 +1645,13 @@ class PolishRulesTest(unittest.TestCase):
         )
 
     def compare_potentially_introducing(
-        self, doc_text, index, expected_truth, *, excluded_nlps=[], expected_truth_3_7_plus=None
+        self,
+        doc_text,
+        index,
+        expected_truth,
+        *,
+        excluded_nlps=[],
+        expected_truth_3_7_plus=None,
     ):
         def func(nlp):
 
@@ -1632,10 +1660,9 @@ class PolishRulesTest(unittest.TestCase):
             doc = nlp(doc_text)
             rules_analyzer = RulesAnalyzerFactory.get_rules_analyzer(nlp)
             rules_analyzer.initialize(doc)
-            if (
-                expected_truth_3_7_plus is not None
-                and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0")
-            ):
+            if expected_truth_3_7_plus is not None and pkg_version.parse(
+                nlp.meta["version"]
+            ) >= pkg_version.parse("3.7.0"):
                 expected = expected_truth_3_7_plus
             else:
                 expected = expected_truth

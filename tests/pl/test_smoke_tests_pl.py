@@ -26,7 +26,7 @@ class PolishSmokeTest(unittest.TestCase):
         *,
         excluded_nlps=[],
         excluded_versions=[],
-        alternative_expected_coref_chains=None
+        alternative_expected_coref_chains=None,
     ):
         def func(nlp):
 
@@ -132,7 +132,7 @@ class PolishSmokeTest(unittest.TestCase):
             "Widziałem Piotra i Agnieszkę. Polowały z koleżanką na kota. Szczęśliwe były.",
             "[0: [3], [5], 1: [5, 7], [12]]",
             alternative_expected_coref_chains="[0: [3], [5]]",
-            excluded_versions=["3.8.0"]
+            excluded_versions=["3.8.0"],
         )
 
     def test_different_sentence_verb(self):

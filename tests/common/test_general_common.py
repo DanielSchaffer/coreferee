@@ -10,6 +10,7 @@ from coreferee.test_utils import get_nlps
 NUMBER_OF_THREADS = 50
 NUMBER_OF_PROCESSES = 2
 
+
 class Worker:
     def listen(self, input_queue):
         while True:
@@ -189,7 +190,7 @@ class CommonGeneralTest(unittest.TestCase):
             input_queues[counter].put((output_queue, doc))
         returned_numbers = set()
         for counter in range(NUMBER_OF_PROCESSES):
-            (first, second, third, fourth, returned_number) = output_queue.get(True, 60)
+            first, second, third, fourth, returned_number = output_queue.get(True, 60)
             self.assertEqual("[0: [0], [3]]", first)
             self.assertEqual("[0: [0], [3]]", second)
             self.assertEqual("[]", third)

@@ -897,7 +897,6 @@ class CommonTendenciesTest(unittest.TestCase):
         else:
             self.fail("Unsupported version.")
 
-
     @unittest.skipIf(train_version_mismatch, train_version_mismatch_message)
     def test_get_cosine_similarity_lg_no_vector_2(self):
 
@@ -935,7 +934,6 @@ class CommonTendenciesTest(unittest.TestCase):
             )
         else:
             self.fail("Unsupported version.")
-
 
     @unittest.skipIf(train_version_mismatch, train_version_mismatch_message)
     def test_get_cosine_similarity_sm_root_1(self):

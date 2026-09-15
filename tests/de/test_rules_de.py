@@ -217,7 +217,7 @@ class GermanRulesTest(unittest.TestCase):
             "Diejenigen der Jungen, die heimgekommen sind, waren müde",
             [2],
             excluded_nlps=["core_news_md", "core_news_sm"],
-            excluded_versions=["3.7.0"]
+            excluded_versions=["3.7.0"],
         )
 
     def test_blacklisted(self):
@@ -350,7 +350,9 @@ class GermanRulesTest(unittest.TestCase):
         )
 
     def test_pleonastic_darauf_2(self):
-        self.compare_potential_anaphor("Das Ergebnis kam darauf an, es zu tun.", [6], excluded_nlps="core_news_sm")
+        self.compare_potential_anaphor(
+            "Das Ergebnis kam darauf an, es zu tun.", [6], excluded_nlps="core_news_sm"
+        )
 
     def test_pleonastic_darauf_aux_1(self):
         self.compare_potential_anaphor(
@@ -482,7 +484,7 @@ class GermanRulesTest(unittest.TestCase):
         expected_truth,
         *,
         excluded_nlps=[],
-        directly=True
+        directly=True,
     ):
         def func(nlp):
 
@@ -717,8 +719,14 @@ class GermanRulesTest(unittest.TestCase):
         )
 
     def test_potential_pair_person_neut_control(self):
-        self.compare_potential_pair("Ich sah ein Kind. diese standen", 3, False, 5, 0,
-        excluded_nlps=["core_news_md", "core_news_sm"])
+        self.compare_potential_pair(
+            "Ich sah ein Kind. diese standen",
+            3,
+            False,
+            5,
+            0,
+            excluded_nlps=["core_news_md", "core_news_sm"],
+        )
 
     def test_potential_pair_male_neut_1(self):
         self.compare_potential_pair("Ich sah ein Mannsbild. Er stand", 3, False, 5, 2)
@@ -1051,7 +1059,7 @@ class GermanRulesTest(unittest.TestCase):
         is_reflexive_anaphor_truth,
         *,
         excluded_nlps=[],
-        excluded_versions = []
+        excluded_versions=[],
     ):
         def func(nlp):
 
@@ -1310,7 +1318,7 @@ class GermanRulesTest(unittest.TestCase):
             True,
             False,
             excluded_nlps=["core_news_md", "core_news_sm"],
-            excluded_versions=["3.7.0"]
+            excluded_versions=["3.7.0"],
         )
 
     def test_reflexive_double_coordination_with_preposition(self):
@@ -1343,7 +1351,7 @@ class GermanRulesTest(unittest.TestCase):
         referring_index,
         expected_truth,
         *,
-        excluded_nlps=[]
+        excluded_nlps=[],
     ):
         def func(nlp):
             if nlp.meta["name"] in excluded_nlps:

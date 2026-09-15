@@ -37,7 +37,7 @@ class EnglishRulesTest(unittest.TestCase):
         expected_governing_sibling,
         expected_has_or_coordination,
         *,
-        excluded_nlps=[]
+        excluded_nlps=[],
     ):
         def func(nlp):
 
@@ -329,7 +329,9 @@ class EnglishRulesTest(unittest.TestCase):
 
             if nlp.meta["name"] in excluded_nlps:
                 return
-            if excluded_nlps_3_7_plus and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0"):
+            if excluded_nlps_3_7_plus and pkg_version.parse(
+                nlp.meta["version"]
+            ) >= pkg_version.parse("3.7.0"):
                 if nlp.meta["name"] in excluded_nlps_3_7_plus:
                     return
             doc = nlp(doc_text)
@@ -340,10 +342,9 @@ class EnglishRulesTest(unittest.TestCase):
             ) or rules_analyzer.is_potential_anaphor(doc[referred_index])
             assert rules_analyzer.is_potential_anaphor(doc[referring_index])
             referred_mention = Mention(doc[referred_index], include_dependent_siblings)
-            if (
-                expected_truth_3_7_plus is not None
-                and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0")
-            ):
+            if expected_truth_3_7_plus is not None and pkg_version.parse(
+                nlp.meta["version"]
+            ) >= pkg_version.parse("3.7.0"):
                 expected = expected_truth_3_7_plus
             else:
                 expected = expected_truth
@@ -512,7 +513,11 @@ class EnglishRulesTest(unittest.TestCase):
     @unittest.skipIf(train_version_mismatch, train_version_mismatch_message)
     def test_potential_pair_person_word_capitalized(self):
         self.compare_potential_pair(
-            "I saw Job. He was there", 2, False, 4, 1,
+            "I saw Job. He was there",
+            2,
+            False,
+            4,
+            1,
             excluded_nlps_3_7_plus=["core_web_trf"],
         )
 
@@ -546,7 +551,7 @@ class EnglishRulesTest(unittest.TestCase):
         expected_reflexive_truth,
         is_reflexive_anaphor_truth,
         *,
-        excluded_nlps=[]
+        excluded_nlps=[],
     ):
         def func(nlp):
 
@@ -817,7 +822,7 @@ class EnglishRulesTest(unittest.TestCase):
         referring_index,
         expected_truth,
         *,
-        excluded_nlps=[]
+        excluded_nlps=[],
     ):
         def func(nlp):
 

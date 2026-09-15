@@ -48,7 +48,7 @@ Author: [Richard Paul Hudson](https://github.com/richardpaulhudson)
 
 Coreferences are situations where two or more words within a text refer to the same entity, e.g. _**John** went home because **he** was tired_. Resolving coreferences is an important general task within the natural language processing field.
 
-Coreferee is a Python 3 library (tested with versions 3.6—3.12) that is used together with [spaCy](https://spacy.io/) (tested with versions 3.0.0—3.5.0) to resolve coreferences within English, French, German and Polish texts. It is designed so that it is easy to add support for new languages. It uses a mixture of neural networks and programmed rules.
+Coreferee is a Python 3 library (tested with versions 3.10—3.14) that is used together with [spaCy](https://spacy.io/) (tested with versions 3.0.0—3.8.0) to resolve coreferences within English, French, German and Polish texts. It is designed so that it is easy to add support for new languages. It uses a mixture of neural networks and programmed rules.
 
 The library was originally developed at [msg systems](https://www.msg.group/en) and was also maintained for a while at [Explosion AI](https://explosion.ai).
 
@@ -101,6 +101,8 @@ Then open a Python prompt (type `python3` or `python` at the command line):
 
 ##### 1.2.2 French
 
+** Please note the caveat under [Open issues](#open-issues): the behaviour for French could not be tested as well as the behaviour for the other languages. **
+
 Presuming you have already installed [spaCy](https://spacy.io/) and one of the French spacy models, install Coreferee from the command line by typing:
 
 ```
@@ -123,15 +125,12 @@ Then open a Python prompt (type `python3` or `python` at the command line):
 >>> doc._.coref_chains.print()
 0: elle(2), son(7), Julie(10), elle(17), son(19)
 1: travail(8), en(11)
-2: [elle(17); mari(20)], ils(23), Ils(29), ils(34)
+2: ils(23), Ils(29), ils(34)
 3: Espagne(32), pays(37)
 >>>
 >>> doc[17]._.coref_chains.print()
 0: elle(2), son(7), Julie(10), elle(17), son(19)
-2: [elle(17); mari(20)], ils(23), Ils(29), ils(34)
->>>
->>> doc._.coref_chains.resolve(doc[34])
-[Julie, mari]
+2: ils(23), Ils(29), ils(34)
 >>>
 ```
 
@@ -681,6 +680,7 @@ The initial open-source version.
 - Added support for spaCy v3.7 and v3.8.
 - Added models for English, French, German, and Polish for spaCy v3.7/v3.8
 - Updated French language rules for spaCy v3.7/v3.8
+- See point 1 under [Open issues](#open-issues): the behaviour for French could not be tested as well as the behaviour for the other languages. 
 
 **Internal changes and fixes**
 
@@ -694,7 +694,7 @@ The initial open-source version.
 
 ### 8. Open issues / requests for assistance
 
-1. Because optimising parsing speed was not a priority in the [project within which Coreferee came into being](#background-information), Coreferee is written purely in Python; it would be helpful if somebody could convert it to Cython.
+1. Because the original contributor of the French rules is no longer involved in the project and the people who are still involved lack the necessary knowledge and intuitions to work with French, we have not been able to investigate test failures that have emerged with new spaCy versions as we would for the other languages; instead, we have simply excluded the tests for the versions in question. It would be most helpful if somebody could investigate the rules and tests further.
 
 2. There are almost certainly changes to the inputs and structure of the neural ensemble that would lead to improvements in accuracy, both cross-linguistically and for specific languages. The only caveat to bear in mind when trying out changes is that it should be possible for someone who does not understand neural networks to write rules for a new language. This means that Coreferee should detect necessary differences in the neural network behaviour between languages automatically rather than requiring the trainer to configure them.
 
