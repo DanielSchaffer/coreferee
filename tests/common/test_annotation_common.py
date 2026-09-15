@@ -2,6 +2,7 @@ import unittest
 from coreferee.test_utils import get_nlps
 
 
+
 class CommonAnnotationTest(unittest.TestCase):
     def setUp(self):
 
