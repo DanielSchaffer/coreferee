@@ -48,9 +48,9 @@ Author: [Richard Paul Hudson](https://github.com/richardpaulhudson)
 
 Coreferences are situations where two or more words within a text refer to the same entity, e.g. _**John** went home because **he** was tired_. Resolving coreferences is an important general task within the natural language processing field.
 
-Coreferee is a Python 3 library (tested with versions 3.10—3.14) that is used together with [spaCy](https://spacy.io/) (tested with versions 3.0.0—3.8.0) to resolve coreferences within English, French, German and Polish texts. It is designed so that it is easy to add support for new languages. It uses a mixture of neural networks and programmed rules.
+Coreferee is a Python 3 library (tested with versions 3.10—3.13) that is used together with [spaCy](https://spacy.io/) (tested with versions 3.2.0—3.8.16) to resolve coreferences within English, French, German and Polish texts. It is designed so that it is easy to add support for new languages. It uses a mixture of neural networks and programmed rules.
 
-Note that for size reasons the models shipped with Coreferee do not support all previous spaCy versions with all languages. If you want to use Coreferee with an older spaCy version that is not supported, please check out a tag for a previous Coreferee version.
+Note that for size reasons the models shipped with Coreferee do not support all previous spaCy versions with all languages. If you want to use Coreferee with an older spaCy version that is not supported, please check out a tag for an appropriate previous Coreferee version (see [7. Version history](#version-history)).
 
 The library was originally developed at [msg systems](https://www.msg.group/en) and was also maintained for a while at [Explosion AI](https://explosion.ai).
 
@@ -240,7 +240,7 @@ With unlimited training data, it would be possible to train a system to employ a
 
 - Especially with limited training data but probably even with the largest available training datasets, it is unlikely that a system will learn more than the very simplest tendencies for strategy 3). However, making word vectors available to neural networks ensures that Coreferee can make use of whatever tendencies are discernable.
 
-Coreferee started life to assist the [Holmes](https://github.com/msg-systems/holmes-extractor) project, which is used for information extraction and intelligent search. Coreferee is in no way dependent on Holmes, but this original aim has led to several design decisions that may seem somewhat atypical. Several of them could easily be altered by someone with a requirement to do so:
+Coreferee started life to assist the [Holmes](https://github.com/msg-systems/holmes-extractor) project, which is no longer maintained as of 2026 but which was used for information extraction and intelligent search. Coreferee is in no way dependent on Holmes, but this original aim led to several design decisions that may seem somewhat atypical. Several of them could easily be altered by someone with a requirement to do so:
 
 - A mention within Coreferee does not consist of a span, but rather of a single token or of a list of tokens that stand in a coordination relationship to one another.
 
@@ -250,11 +250,13 @@ Coreferee started life to assist the [Holmes](https://github.com/msg-systems/hol
 
 - Coreferee focusses heavily on anaphors (for English: pronouns). There is only relatively limited capture of coreference between noun phrases, and it is entirely rule-based. (In turn, however, this serves the aim of working with limited training data: noun-phrase coreference is a more exacting task than anaphor resolution.)
 
-- Because search performance is much more important for Holmes than document parsing performance, Coreferee performs all analysis eagerly as each document passes through the pipe.
+- Because search performance was much more important for Holmes than document parsing performance, Coreferee performs all analysis eagerly as each document passes through the pipe.
 
 <a id="facts-and-figures"></a>
 
 #### 1.4 Facts and figures
+
+**Note that the following tables capture the accuracies measured when Coreferee was first written and evaluated. Time constraints meant it was not possible to carry out extensive evaluations for later spaCy versions, where the accuracies may differ.**
 
 <a id="covered-relevant-linguistic-features"></a>
 
@@ -288,8 +290,6 @@ Coreferee started life to assist the [Holmes](https://github.com/msg-systems/hol
 Coreferee produces a range of neural-network models for each language corresponding to the various spaCy models for that language. The [neural network inputs](#the-neural-ensemble) include word vectors. With `_sm` (small) models, both spaCy and Coreferee use context-sensitive tensors as an alternative to word vectors. `_trf` (transformer-based) models, on the other hand, do not use or offer word vectors at all. To remedy this problem, the model configuration files (`config.cfg` in the directory for each language) allow a **vectors model** to be specified for use when a main model does not have its own vectors. Coreferee then combines the linguistic information generated by the main model with vector information returned for the individual words in each document by the vectors model.
 
 Because the Coreferee models are rather large (20GB-30GB for the group of models for a given language) and because many users will only be interested in one language, the group of models for a given language is installed using `python3 -m coreferee install` as demonstrated in the introduction. All Coreferee models are more or less the same size; a larger spaCy model does not equate to a larger Coreferee model. As the figures above demonstrate, the accuracy of Coreferee corresponds closely to the size of the underlying spaCy model, and users are urged to use the larger spaCy models. It is in any case unclear whether there is a situation in which it would make sense to use Coreferee with an `_sm` model as the Coreferee model would then be considerably larger than the spaCy model! As this discrepancy is especially extreme for the Polish models, Coreferee no longer supports `pl_core_news_sm` from version 1.1.0 onwards.
-
-**Note that the table captures the accuracies measured when Coreferee was first written and evaluated. Time constraints meant it was not possible to carry out extensive evaluations for later spaCy versions, where the accuracies may differ.**
 
 Assessing and comparing the precision and recall of anaphor resolution algorithms is notoriously difficult. For one thing, two human annotators of the same data will not always agree (and, indeed, there are some cases where Coreferee and a training annotator disagree where Coreferee's interpretation seems the more plausible!) And the same algorithm may perform with wildly different accuracies with different test documents depending on how clearly the documents are written and how often there are competing interpretations of individual anaphors.
 
