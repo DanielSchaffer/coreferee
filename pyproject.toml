@@ -3,7 +3,7 @@ name = "coreferee"
 version = "1.5.0"
 description = "Coreference resolution for English, French, German and Polish, optimised for limited training data and easily extensible for further languages"
 readme = {file = "SHORTREADME.md", content-type = "text/markdown"}
-requires-python = ">=3.6,<3.13"
+requires-python = ">=3.10,<3.15"
 license = "MIT"
 authors = [
     {name = "Richard Paul Hudson", email = "hudsonrichardpaul@gmail.com"}

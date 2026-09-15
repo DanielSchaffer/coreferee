@@ -287,7 +287,7 @@ Coreferee produces a range of neural-network models for each language correspond
 
 Because the Coreferee models are rather large (20GB-30GB for the group of models for a given language) and because many users will only be interested in one language, the group of models for a given language is installed using `python3 -m coreferee install` as demonstrated in the introduction. All Coreferee models are more or less the same size; a larger spaCy model does not equate to a larger Coreferee model. As the figures above demonstrate, the accuracy of Coreferee corresponds closely to the size of the underlying spaCy model, and users are urged to use the larger spaCy models. It is in any case unclear whether there is a situation in which it would make sense to use Coreferee with an `_sm` model as the Coreferee model would then be considerably larger than the spaCy model! As this discrepancy is especially extreme for the Polish models, Coreferee no longer supports `pl_core_news_sm` from version 1.1.0 onwards.
 
-The English, German and Polish models support spaCy versions from 3.0.0 to 3.5.0, while the French models support spaCy versions from 3.1.0 to 3.2.0. Because the accuracies and number of anaphors found differ slightly depending on the spaCy version used, the table above cites ranges for each model.
+**Note that the table captures the accuracies measured when Coreferee was first written and evaluated. Time constraints meant it was not possible to carry out extensive evaluations for later spaCy versions, where the accuracies may differ.**
 
 Assessing and comparing the precision and recall of anaphor resolution algorithms is notoriously difficult. For one thing, two human annotators of the same data will not always agree (and, indeed, there are some cases where Coreferee and a training annotator disagree where Coreferee's interpretation seems the more plausible!) And the same algorithm may perform with wildly different accuracies with different test documents depending on how clearly the documents are written and how often there are competing interpretations of individual anaphors.
 
@@ -676,7 +676,7 @@ The initial open-source version.
 
 ##### 7.12 Version 1.5.0
 
-- Added support for Python v3.12.
+- Changed Python version support to reflect the current range.
 - Added support for spaCy v3.7 and v3.8.
 - Added models for English, French, German, and Polish for spaCy v3.7/v3.8
 - Updated French language rules for spaCy v3.7/v3.8
