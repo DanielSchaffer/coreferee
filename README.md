@@ -54,7 +54,7 @@ Coreferee is a Python 3 library for resolving coreferences in English, French, G
 
 Coreference decisions are made in the context of the emerging coreference chain rather than independently. When adding a new mention, the annotator checks compatibility with other members of the chain; if a later decision exposes an inconsistency, it can backtrack over recent assignments and try alternative antecedents.
 
-Coreferee is tested with versions 3.10—3.13 and [spaCy](https://spacy.io/) versions 3.2.0—3.8.16. Note that for size reasons the models shipped with Coreferee do not support all previous spaCy versions with all languages. If you want to use Coreferee with an older spaCy version that is not supported, please check out a tag for an appropriate previous Coreferee version (see [7. Version history](#version-history)).
+Coreferee is tested with Python versions 3.10—3.13 and [spaCy](https://spacy.io/) versions 3.2.0—3.8.16. Note that for size reasons the models shipped with Coreferee do not support all previous spaCy versions with all languages. If you want to use Coreferee with an older spaCy version that is not supported, please check out a tag for an appropriate previous Coreferee version (see [7. Version history](#version-history)).
 
 The library was originally developed at [msg systems](https://www.msg.group/en) and was also maintained for a while at [Explosion AI](https://explosion.ai).
 

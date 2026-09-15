@@ -6,7 +6,6 @@ Coreferee is a Python 3 library for resolving coreferences in English, French, G
 
 Coreference decisions are made in the context of the emerging coreference chain rather than independently. When adding a new mention, the annotator checks compatibility with other members of the chain; if a later decision exposes an inconsistency, it can backtrack over recent assignments and try alternative antecedents.
 
-
 The library was originally developed at [msg systems](https://www.msg.group/en) and was also maintained for a while at [Explosion AI](https://explosion.ai).
 
 For more information, please see the [main documentation on GitHub](https://github.com/richardpaulhudson/coreferee).
