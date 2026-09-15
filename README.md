@@ -101,7 +101,7 @@ Then open a Python prompt (type `python3` or `python` at the command line):
 
 ##### 1.2.2 French
 
-** Please note the caveat under [Open issues](#open-issues): the behaviour for French could not be tested as well as the behaviour for the other languages. **
+**Please note the caveat under [Open issues](#open-issues): the behaviour for French could not be tested to the same standard as the behaviour for the other languages.**
 
 Presuming you have already installed [spaCy](https://spacy.io/) and one of the French spacy models, install Coreferee from the command line by typing:
 
