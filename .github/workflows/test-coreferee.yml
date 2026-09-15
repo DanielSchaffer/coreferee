@@ -10,10 +10,12 @@ jobs:
         os: [macos-latest, windows-latest, ubuntu-latest]
         python_version: ['3.10', '3.11', '3.12', '3.13']
         spacy_version: ['3.8.16']
+        click_version: ['8.5.0']
         include:
           - os: 'ubuntu-latest'
             python_version: '3.10'
             spacy_version: '3.7.5'
+            click_version: '8.1.8'
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout repository code
@@ -28,7 +30,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install spacy==${{ matrix.spacy_version }} pytest
-        python -m pip install click==8.1.8
+        python -m pip install click==${{ matrix.click_version }}
         python -m pip check
 
     - name: Install spaCy models
