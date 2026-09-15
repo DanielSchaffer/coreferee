@@ -2,7 +2,7 @@
 
 Author: [Richard Paul Hudson](https://github.com/richardpaulhudson)
 
-*Current status*: Coreferee is maintained for compatibility with current spaCy releases. The current release supports Python 3.10–3.13 and spaCy 3.2–3.8.
+*Current status*: Coreferee is maintained for compatibility with current spaCy releases. The current release supports Python 3.10–3.13 and spaCy 3.7–3.8, while retaining compatibility with selected earlier spaCy versions.
 
 - [1. Introduction](#introduction)
   - [1.1 The basic idea](#the-basic-idea)
@@ -79,7 +79,7 @@ Note that:
 Then open a Python prompt (type `python3` or `python` at the command line):
 
 ```
->>> import coreferee, spacy
+>>> import spacy
 >>> nlp = spacy.load('en_core_web_trf')
 >>> nlp.add_pipe('coreferee')
 <coreferee.manager.CorefereeBroker object at 0x000002DE8E9256D0>
@@ -157,7 +157,7 @@ Note that the required command may be `python` rather than `python3` on some ope
 Then open a Python prompt (type `python3` or `python` at the command line):
 
 ```
->>> import coreferee, spacy
+>>> import spacy
 >>> nlp = spacy.load('de_core_news_lg')
 >>> nlp.add_pipe('coreferee')
 <coreferee.manager.CorefereeBroker object at 0x0000026E84C63B50>
@@ -195,7 +195,7 @@ Note that the required command may be `python` rather than `python3` on some ope
 Then open a Python prompt (type `python3` or `python` at the command line):
 
 ```
->>> import coreferee, spacy
+>>> import spacy
 >>> nlp = spacy.load('pl_core_news_lg')
 >>> nlp.add_pipe('coreferee')
 <coreferee.manager.CorefereeBroker object at 0x0000027304C63B50>
@@ -245,7 +245,7 @@ With unlimited training data, it would be possible to train a system to employ a
 
 - Especially with limited training data but probably even with the largest available training datasets, it is unlikely that a system will learn more than the very simplest tendencies for strategy 3). However, making word vectors available to neural networks ensures that Coreferee can make use of whatever tendencies are discernable.
 
-Coreferee started life to assist the [Holmes](https://github.com/msg-systems/holmes-extractor) project, which is no longer maintained as of 2026 but which was used for information extraction and intelligent search. Coreferee is in no way dependent on Holmes, but this original aim led to several design decisions that may seem somewhat atypical. Several of them could easily be altered by someone with a requirement to do so:
+Coreferee started life to assist the [Holmes](https://github.com/msg-systems/holmes-extractor) project, which is no longer maintained but which was used for information extraction and intelligent search. Coreferee is in no way dependent on Holmes, but this original aim led to several design decisions that may seem somewhat atypical. Several of them could easily be altered by someone with a requirement to do so:
 
 - A mention within Coreferee does not consist of a span, but rather of a single token or of a list of tokens that stand in a coordination relationship to one another.
 
