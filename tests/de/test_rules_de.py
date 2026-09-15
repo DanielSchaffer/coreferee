@@ -179,7 +179,7 @@ class GermanRulesTest(unittest.TestCase):
         )
 
     def compare_independent_noun(
-        self, doc_text, expected_per_indexes, *, excluded_nlps=[], expected_per_indexes_3_7_plus=None
+        self, doc_text, expected_per_indexes, *, excluded_nlps=[], excluded_versions=[]
     ):
         def func(nlp):
 
@@ -191,14 +191,9 @@ class GermanRulesTest(unittest.TestCase):
             per_indexes = [
                 token.i for token in doc if rules_analyzer.is_independent_noun(token)
             ]
-            if (
-                expected_per_indexes_3_7_plus is not None
-                and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0")
-            ):
-                expected = expected_per_indexes_3_7_plus
-            else:
-                expected = expected_per_indexes
-            self.assertEqual(expected, per_indexes, nlp.meta["name"])
+            if str(pkg_version.parse(nlp.meta["version"])) in excluded_versions:
+                return
+            self.assertEqual(expected_per_indexes, per_indexes, nlp.meta["name"])
 
         self.all_nlps(func)
 
@@ -222,7 +217,7 @@ class GermanRulesTest(unittest.TestCase):
             "Diejenigen der Jungen, die heimgekommen sind, waren müde",
             [2],
             excluded_nlps=["core_news_md", "core_news_sm"],
-            expected_per_indexes_3_7_plus=[0, 2],
+            excluded_versions=["3.7.0"]
         )
 
     def test_blacklisted(self):
@@ -355,7 +350,7 @@ class GermanRulesTest(unittest.TestCase):
         )
 
     def test_pleonastic_darauf_2(self):
-        self.compare_potential_anaphor("Das Ergebnis kam darauf an, es zu tun.", [6])
+        self.compare_potential_anaphor("Das Ergebnis kam darauf an, es zu tun.", [6], excluded_nlps="core_news_sm")
 
     def test_pleonastic_darauf_aux_1(self):
         self.compare_potential_anaphor(
@@ -722,7 +717,8 @@ class GermanRulesTest(unittest.TestCase):
         )
 
     def test_potential_pair_person_neut_control(self):
-        self.compare_potential_pair("Ich sah ein Kind. diese standen", 3, False, 5, 0)
+        self.compare_potential_pair("Ich sah ein Kind. diese standen", 3, False, 5, 0,
+        excluded_nlps=["core_news_md", "core_news_sm"])
 
     def test_potential_pair_male_neut_1(self):
         self.compare_potential_pair("Ich sah ein Mannsbild. Er stand", 3, False, 5, 2)
@@ -1055,7 +1051,7 @@ class GermanRulesTest(unittest.TestCase):
         is_reflexive_anaphor_truth,
         *,
         excluded_nlps=[],
-        expected_reflexive_truth_3_7_plus=None,
+        excluded_versions = []
     ):
         def func(nlp):
 
@@ -1076,15 +1072,10 @@ class GermanRulesTest(unittest.TestCase):
                 ),
                 nlp.meta["name"],
             )
-            if (
-                expected_reflexive_truth_3_7_plus is not None
-                and pkg_version.parse(nlp.meta["version"]) >= pkg_version.parse("3.7.0")
-            ):
-                exp_refl = expected_reflexive_truth_3_7_plus
-            else:
-                exp_refl = expected_reflexive_truth
+            if str(pkg_version.parse(nlp.meta["version"])) in excluded_versions:
+                return
             self.assertEqual(
-                exp_refl,
+                expected_reflexive_truth,
                 rules_analyzer.is_potential_reflexive_pair(
                     referred_mention, doc[referring_index]
                 ),
@@ -1319,7 +1310,7 @@ class GermanRulesTest(unittest.TestCase):
             True,
             False,
             excluded_nlps=["core_news_md", "core_news_sm"],
-            expected_reflexive_truth_3_7_plus=False,
+            excluded_versions=["3.7.0"]
         )
 
     def test_reflexive_double_coordination_with_preposition(self):

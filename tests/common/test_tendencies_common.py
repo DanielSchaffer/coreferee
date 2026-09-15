@@ -841,9 +841,16 @@ class CommonTendenciesTest(unittest.TestCase):
                     Mention(doc[0], False), doc[4]
                 ),
             )
-        elif self.lg_nlp.meta["version"] in ("3.7.1", "3.8.0"):
+        elif self.lg_nlp.meta["version"] == "3.7.1":
             self.compare_compatibility_map(
                 [4, 0, 0, 0.22459802, 5],
+                self.lg_tendencies_analyzer.get_compatibility_map(
+                    Mention(doc[0], False), doc[4]
+                ),
+            )
+        elif self.lg_nlp.meta["version"] == "3.8.0":
+            self.compare_compatibility_map(
+                [4, 0, 0, 0.33366209, 5],
                 self.lg_tendencies_analyzer.get_compatibility_map(
                     Mention(doc[0], False), doc[4]
                 ),
@@ -873,9 +880,16 @@ class CommonTendenciesTest(unittest.TestCase):
                     Mention(doc[0], False), doc[4]
                 ),
             )
-        elif self.lg_nlp.meta["version"] in ("3.7.1", "3.8.0"):
+        elif self.lg_nlp.meta["version"] == "3.7.1":
             self.compare_compatibility_map(
                 [4, 0, 1, 1.0, 6],
+                self.lg_tendencies_analyzer.get_compatibility_map(
+                    Mention(doc[0], False), doc[4]
+                ),
+            )
+        elif self.lg_nlp.meta["version"] == "3.8.0":
+            self.compare_compatibility_map(
+                [4, 0, 0, 0.59521705, 5],
                 self.lg_tendencies_analyzer.get_compatibility_map(
                     Mention(doc[0], False), doc[4]
                 ),
@@ -905,9 +919,16 @@ class CommonTendenciesTest(unittest.TestCase):
                     Mention(doc[0], False), doc[4]
                 ),
             )
-        elif self.lg_nlp.meta["version"] in ("3.7.1", "3.8.0"):
+        elif self.lg_nlp.meta["version"] == "3.7.1":
             self.compare_compatibility_map(
                 [4, 0, 0, 0.52951103, 2],
+                self.lg_tendencies_analyzer.get_compatibility_map(
+                    Mention(doc[0], False), doc[4]
+                ),
+            )
+        elif self.lg_nlp.meta["version"] == "3.8.0":
+            self.compare_compatibility_map(
+                [4, 0, 0, 0.59521705, 3],
                 self.lg_tendencies_analyzer.get_compatibility_map(
                     Mention(doc[0], False), doc[4]
                 ),

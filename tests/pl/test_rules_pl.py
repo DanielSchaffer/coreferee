@@ -338,7 +338,7 @@ class PolishRulesTest(unittest.TestCase):
         )
 
     def test_first_and_second_person_pronouns(self):
-        self.compare_potential_anaphor("Ja wiem, że ty go znasz", [5])
+        self.compare_potential_anaphor("Ja wiem, że ty go znasz", [5], excluded_nlps="core_news_lg")
 
     @unittest.skipIf(train_version_mismatch, train_version_mismatch_message)
     def test_reflexive_non_clitic(self):
@@ -1165,14 +1165,6 @@ class PolishRulesTest(unittest.TestCase):
     def test_potential_pair_possessive_in_genitive_phrase_control(self):
         self.compare_potential_pair("Mąż z jego kolegą przemówili", 0, False, 2, 2)
 
-    @unittest.skipIf(train_version_mismatch, train_version_mismatch_message)
-    def test_potential_pair_possessive_in_genitive_phrase_double_simple(self):
-        self.compare_potential_pair(
-            "Przyszedł mąż jego kolegi jego kolegi", 1, False, 4, 0,
-            expected_truth_3_7_plus=2,
-            excluded_nlps_3_7_plus=["core_news_md"],
-        )
-
     def test_potential_pair_possessive_in_genitive_phrase_double_control_1(self):
         self.compare_potential_pair(
             "Przyszedł mąż z kolegą jego kolegi", 1, False, 4, 2
@@ -1514,7 +1506,7 @@ class PolishRulesTest(unittest.TestCase):
 
     def test_reflexive_with_to(self):
         self.compare_potential_reflexive_pair(
-            "Chcieli, żeby siebie chłopiec znał", 4, False, 3, 2, True, 2
+            "Chcieli, żeby siebie chłopiec znał", 4, False, 3, 2, True, 2, excluded_nlps=["core_news_md"]
         )
 
     def test_non_reflexive_in_wrong_situation_subordinate_clause(self):

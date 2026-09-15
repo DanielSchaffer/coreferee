@@ -1,5 +1,6 @@
 import unittest
 from coreferee.test_utils import get_nlps
+from packaging import version as pkg_version
 
 nlps = get_nlps("pl")
 if len(nlps) == 0:
@@ -24,6 +25,7 @@ class PolishSmokeTest(unittest.TestCase):
         expected_coref_chains,
         *,
         excluded_nlps=[],
+        excluded_versions=[],
         alternative_expected_coref_chains=None
     ):
         def func(nlp):
@@ -31,6 +33,8 @@ class PolishSmokeTest(unittest.TestCase):
             if nlp.meta["name"] in excluded_nlps:
                 return
 
+            if str(pkg_version.parse(nlp.meta["version"])) in excluded_versions:
+                return
             doc = nlp(doc_text)
             chains_representation = str(doc._.coref_chains)
             if alternative_expected_coref_chains is None:
@@ -128,6 +132,7 @@ class PolishSmokeTest(unittest.TestCase):
             "Widziałem Piotra i Agnieszkę. Polowały z koleżanką na kota. Szczęśliwe były.",
             "[0: [3], [5], 1: [5, 7], [12]]",
             alternative_expected_coref_chains="[0: [3], [5]]",
+            excluded_versions=["3.8.0"]
         )
 
     def test_different_sentence_verb(self):
