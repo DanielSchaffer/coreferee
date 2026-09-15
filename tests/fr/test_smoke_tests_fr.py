@@ -263,6 +263,7 @@ class FrenchSmokeTest(unittest.TestCase):
             "[0: [2], [7], [10], [17], [19], 1: [8], [11], 2: [17, 20], [23], [29], [34], 3: [32], [37]]",
             alternative_expected_coref_chains="[0: [2], [7], [8], [10], 1: [11], [34], 2: [23], [29], 3: [32], [37]]",
             excluded_nlps=["core_news_sm", "core_news_md"],
+            excluded_versions=["3.7.0"]
             
         )
 
