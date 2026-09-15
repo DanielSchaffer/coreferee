@@ -54,7 +54,7 @@ Coreferee is a Python 3 library for resolving coreferences in English, French, G
 
 Coreference decisions are made in the context of the emerging coreference chain rather than independently. When adding a new mention, the annotator checks compatibility with other members of the chain; if a later decision exposes an inconsistency, it can backtrack over recent assignments and try alternative antecedents.
 
-Coreferee is tested with versions 3.10—3.13 and [spaCy](https://spacy.io/) versions 3.2.0—3.8.16.Note that for size reasons the models shipped with Coreferee do not support all previous spaCy versions with all languages. If you want to use Coreferee with an older spaCy version that is not supported, please check out a tag for an appropriate previous Coreferee version (see [7. Version history](#version-history)).
+Coreferee is tested with versions 3.10—3.13 and [spaCy](https://spacy.io/) versions 3.2.0—3.8.16. Note that for size reasons the models shipped with Coreferee do not support all previous spaCy versions with all languages. If you want to use Coreferee with an older spaCy version that is not supported, please check out a tag for an appropriate previous Coreferee version (see [7. Version history](#version-history)).
 
 The library was originally developed at [msg systems](https://www.msg.group/en) and was also maintained for a while at [Explosion AI](https://explosion.ai).
 
@@ -263,7 +263,7 @@ Coreferee started life to assist the [Holmes](https://github.com/msg-systems/hol
 
 #### 1.4 Facts and figures
 
-**Note that the following tables capture the accuracies measured when Coreferee was first written and evaluated. Time constraints meant it was not possible to carry out extensive evaluations for later spaCy versions, where the accuracies may differ. Given the limited amount of annotated coreference data available at the time, the same held-out data was used both to determine when training should stop and to report the final accuracy figures. These results should therefore be regarded as indicative rather than fully independent benchmark results.**
+**Note that the following tables capture the accuracies measured when Coreferee was first written and evaluated. Time constraints meant it was not possible to carry out extensive evaluations for later spaCy versions, where the accuracies may differ. Given the limited amount of annotated coreference data available at the time, the same held-out data was used during model tuning, including to determine when training should stop, and to report the final accuracy figures. These results should therefore be regarded as indicative rather than fully independent benchmark results.**
 
 <a id="covered-relevant-linguistic-features"></a>
 
