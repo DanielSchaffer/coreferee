@@ -695,7 +695,7 @@ The initial open-source version.
 - Added conditional use of `importlib.resources` instead of `pkg_resources` for Python >= 3.9.
 - Migrated package setup to `pyproject.toml`.
 - Fixed outdated URLs for training corpora.
-- Improve scripts for downloading corpora and converting French corpora to conll.
+- Improved scripts for downloading corpora and converting French corpora to conll.
 
 <a id="open-issues"></a>
 
